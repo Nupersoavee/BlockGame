@@ -117,12 +117,6 @@
         let cubeY = window.innerHeight / 2 - cube.offsetHeight / 2;
         let speed = 5;
 
-        // Continuous movement variables
-        let moveLeft = false;
-        let moveRight = false;
-        let moveUp = false;
-        let moveDown = false;
-
         // Function to update the cube's position
         function updateCubePosition() {
             cube.style.left = cubeX + 'px';
@@ -331,58 +325,20 @@
             switch (event.key) {
                 case 'ArrowLeft':
                 case 'a':
-                    moveLeft = true;
+                    cubeX -= speed;
                     break;
                 case 'ArrowRight':
                 case 'd':
-                    moveRight = true;
+                    cubeX += speed;
                     break;
                 case 'ArrowUp':
                 case 'w':
-                    moveUp = true;
+                    cubeY -= speed;
                     break;
                 case 'ArrowDown':
                 case 's':
-                    moveDown = true;
+                    cubeY += speed;
                     break;
-            }
-        });
-
-        // Event listener for key release
-        document.addEventListener('keyup', function(event) {
-            switch (event.key) {
-                case 'ArrowLeft':
-                case 'a':
-                    moveLeft = false;
-                    break;
-                case 'ArrowRight':
-                case 'd':
-                    moveRight = false;
-                    break;
-                case 'ArrowUp':
-                case 'w':
-                    moveUp = false;
-                    break;
-                case 'ArrowDown':
-                case 's':
-                    moveDown = false;
-                    break;
-            }
-        });
-
-        // Update cube's position continuously
-        function updateCubePositionContinuously() {
-            if (moveLeft) {
-                cubeX -= speed;
-            }
-            if (moveRight) {
-                cubeX += speed;
-            }
-            if (moveUp) {
-                cubeY -= speed;
-            }
-            if (moveDown) {
-                cubeY += speed;
             }
 
             // Ensure the cube stays within the container
@@ -399,13 +355,7 @@
 
             // Save the points in local storage
             localStorage.setItem('points', points.toString());
-
-            // Continue updating the cube's position
-            requestAnimationFrame(updateCubePositionContinuously);
-        }
-
-        // Start continuously updating the cube's position
-        updateCubePositionContinuously();
+        });
 
         // Event listener for speed input change
         speedInput.addEventListener('input', function() {
@@ -445,7 +395,7 @@
         setInterval(createLightBlueBlock, 5000);
 
         // Create cyan blocks rarely
-        setInterval(createCyanBlock, 2000); /* Added setInterval for cyan blocks */
+        setInterval(createCyanBlock, 20000); /* Added setInterval for cyan blocks */
 
         // Initial position
         updateCubePosition();
