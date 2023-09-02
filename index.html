@@ -21,7 +21,7 @@
             position: absolute;
             width: 50px;
             height: 50px;
-            background-color: blue;
+            background-color: black; /* Changed character block color to black */
         }
         #speedInput {
             position: absolute;
@@ -44,13 +44,25 @@
             position: absolute;
             width: 50px;
             height: 50px;
-            background-color: rgb(251, 255, 0);
+            background-color: orange;
         }
         .light-green-block {
             position: absolute;
             width: 50px;
             height: 50px;
-            background-color: rgb(157, 255, 157);
+            background-color: lightgreen;
+        }
+        .light-blue-block {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            background-color: lightblue;
+        }
+        .cyan-block {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            background-color: cyan; /* Added cyan block */
         }
         #pointsLabel {
             position: absolute;
@@ -77,6 +89,8 @@
         const orangeBlocks = [];
         const yellowBlocks = [];
         const lightGreenBlocks = [];
+        const lightBlueBlocks = [];
+        const cyanBlocks = []; /* Added an array for cyan blocks */
         let points = 0;
 
         let cubeX = window.innerWidth / 2 - cube.offsetWidth / 2;
@@ -127,6 +141,26 @@
             lightGreenBlock.style.top = Math.random() * (window.innerHeight - 50) + 'px';
             container.appendChild(lightGreenBlock);
             lightGreenBlocks.push(lightGreenBlock);
+        }
+
+        // Function to create a light blue block
+        function createLightBlueBlock() {
+            const lightBlueBlock = document.createElement('div');
+            lightBlueBlock.className = 'light-blue-block';
+            lightBlueBlock.style.left = Math.random() * (window.innerWidth - 50) + 'px';
+            lightBlueBlock.style.top = Math.random() * (window.innerHeight - 50) + 'px';
+            container.appendChild(lightBlueBlock);
+            lightBlueBlocks.push(lightBlueBlock);
+        }
+
+        // Function to create a cyan block
+        function createCyanBlock() {
+            const cyanBlock = document.createElement('div');
+            cyanBlock.className = 'cyan-block';
+            cyanBlock.style.left = Math.random() * (window.innerWidth - 50) + 'px';
+            cyanBlock.style.top = Math.random() * (window.innerHeight - 50) + 'px';
+            container.appendChild(cyanBlock);
+            cyanBlocks.push(cyanBlock);
         }
 
         // Check for collisions with red blocks
@@ -217,6 +251,50 @@
             }
         }
 
+        // Check for collisions with light blue blocks
+        function checkLightBlueCollisions() {
+            for (let i = 0; i < lightBlueBlocks.length; i++) {
+                const lightBlueBlock = lightBlueBlocks[i];
+                const rect1 = cube.getBoundingClientRect();
+                const rect2 = lightBlueBlock.getBoundingClientRect();
+
+                if (
+                    rect1.left < rect2.right &&
+                    rect1.right > rect2.left &&
+                    rect1.top < rect2.bottom &&
+                    rect1.bottom > rect2.top
+                ) {
+                    // Collision with a light blue block, remove it and award 25+ points
+                    container.removeChild(lightBlueBlock);
+                    lightBlueBlocks.splice(i, 1);
+                    points += 25;
+                    updatePointsLabel();
+                }
+            }
+        }
+
+        // Check for collisions with cyan blocks
+        function checkCyanCollisions() {
+            for (let i = 0; i < cyanBlocks.length; i++) {
+                const cyanBlock = cyanBlocks[i];
+                const rect1 = cube.getBoundingClientRect();
+                const rect2 = cyanBlock.getBoundingClientRect();
+
+                if (
+                    rect1.left < rect2.right &&
+                    rect1.right > rect2.left &&
+                    rect1.top < rect2.bottom &&
+                    rect1.bottom > rect2.top
+                ) {
+                    // Collision with a cyan block, remove it and award 15+ points
+                    container.removeChild(cyanBlock);
+                    cyanBlocks.splice(i, 1);
+                    points += 15;
+                    updatePointsLabel();
+                }
+            }
+        }
+
         // Update the points label
         function updatePointsLabel() {
             pointsLabel.textContent = `Points: ${points}`;
@@ -252,12 +330,24 @@
             checkOrangeCollisions();
             checkYellowCollisions();
             checkLightGreenCollisions();
+            checkLightBlueCollisions();
+            checkCyanCollisions(); /* Added check for cyan collisions */
+
+            // Save the points in local storage
+            localStorage.setItem('points', points.toString());
         });
 
         // Event listener for speed input change
         speedInput.addEventListener('input', function() {
             speed = parseInt(speedInput.value, 10);
         });
+
+        // Load the saved points from local storage
+        const savedPoints = localStorage.getItem('points');
+        if (savedPoints) {
+            points = parseInt(savedPoints, 10);
+            updatePointsLabel();
+        }
 
         // Create red blocks at random intervals
         setInterval(createRedBlock, 2000);
@@ -266,14 +356,19 @@
         setInterval(createOrangeBlock, 10000);
 
         // Create yellow blocks (colored orange) rarely
-        setInterval(createYellowBlock, 3000);
+        setInterval(createYellowBlock, 15000);
 
         // Create light green blocks very rarely
         setInterval(createLightGreenBlock, 100000);
 
+        // Create light blue blocks rarely
+        setInterval(createLightBlueBlock, 5000);
+
+        // Create cyan blocks rarely
+        setInterval(createCyanBlock, 2000); /* Added setInterval for cyan blocks */
+
         // Initial position
         updateCubePosition();
-        updatePointsLabel();
     </script>
 </body>
 </html>
