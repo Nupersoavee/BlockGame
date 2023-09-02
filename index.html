@@ -27,6 +27,11 @@
             position: absolute;
             top: 10px;
             left: 10px;
+            padding: 5px;
+            background-color: white;
+            border: none;
+            border-radius: 5px;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2); /* Added drop shadow */
         }
         .red-block {
             position: absolute;
@@ -70,6 +75,19 @@
             right: 10px;
             color: white;
             font-size: 20px;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5); /* Added text shadow */
+        }
+        #resetButton {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            padding: 5px 10px;
+            background-color: red;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2); /* Added drop shadow */
         }
     </style>
 </head>
@@ -79,12 +97,14 @@
     </div>
     <input type="number" id="speedInput" placeholder="Speed" min="1" value="5">
     <div id="pointsLabel">Points: 0</div>
+    <button id="resetButton">Reset Points</button> <!-- Added reset button -->
     
     <script>
         const cube = document.getElementById('cube');
         const container = document.getElementById('container');
         const speedInput = document.getElementById('speedInput');
         const pointsLabel = document.getElementById('pointsLabel');
+        const resetButton = document.getElementById('resetButton'); // Added reset button element
         const redBlocks = [];
         const orangeBlocks = [];
         const yellowBlocks = [];
@@ -349,6 +369,16 @@
             updatePointsLabel();
         }
 
+        // Event listener for reset button click
+        resetButton.addEventListener('click', function() {
+            const confirmReset = confirm('Are you sure you want to reset your points?');
+            if (confirmReset) {
+                points = 0;
+                updatePointsLabel();
+                localStorage.setItem('points', '0'); // Reset points in local storage
+            }
+        });
+
         // Create red blocks at random intervals
         setInterval(createRedBlock, 2000);
 
@@ -365,7 +395,7 @@
         setInterval(createLightBlueBlock, 5000);
 
         // Create cyan blocks rarely
-        setInterval(createCyanBlock, 20000); /* Added setInterval for cyan blocks */
+        setInterval(createCyanBlock, 2000); /* Added setInterval for cyan blocks */
 
         // Initial position
         updateCubePosition();
