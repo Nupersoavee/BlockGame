@@ -123,6 +123,10 @@
         let moveUp = false;
         let moveDown = false;
 
+        // Touch variables
+        let touchX = cubeX;
+        let touchY = cubeY;
+
         // Function to update the cube's position
         function updateCubePosition() {
             cube.style.left = cubeX + 'px';
@@ -370,6 +374,12 @@
             }
         });
 
+        // Touch event listener for mobile support
+        container.addEventListener('touchstart', function(event) {
+            touchX = event.touches[0].clientX - cube.offsetWidth / 2;
+            touchY = event.touches[0].clientY - cube.offsetHeight / 2;
+        });
+
         // Update cube's position continuously
         function updateCubePositionContinuously() {
             if (moveLeft) {
@@ -389,13 +399,23 @@
             cubeX = Math.max(0, Math.min(window.innerWidth - cube.offsetWidth, cubeX));
             cubeY = Math.max(0, Math.min(window.innerHeight - cube.offsetHeight, cubeY));
 
+            // Smoothly move towards the touch position on mobile
+            const dx = touchX - cubeX;
+            const dy = touchY - cubeY;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            if (distance > 1) {
+                const speedFactor = speed / distance;
+                cubeX += dx * speedFactor;
+                cubeY += dy * speedFactor;
+            }
+
             updateCubePosition();
             checkCollisions();
             checkOrangeCollisions();
             checkYellowCollisions();
             checkLightGreenCollisions();
             checkLightBlueCollisions();
-            checkCyanCollisions(); /* Added check for cyan collisions */
+            checkCyanCollisions();
 
             // Save the points in local storage
             localStorage.setItem('points', points.toString());
@@ -445,7 +465,7 @@
         setInterval(createLightBlueBlock, 5000);
 
         // Create cyan blocks rarely
-        setInterval(createCyanBlock, 20000); /* Added setInterval for cyan blocks */
+        setInterval(createCyanBlock, 2000);
 
         // Initial position
         updateCubePosition();
