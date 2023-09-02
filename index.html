@@ -89,44 +89,6 @@
             border-radius: 5px;
             box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2); /* Added drop shadow */
         }
-        #shopButton {
-            position: absolute;
-            bottom: 10px;
-            left: 10px;
-            padding: 5px 10px;
-            background-color: #3498db;
-            color: white;
-            border: none;
-            cursor: pointer;
-            border-radius: 5px;
-            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2); /* Added drop shadow */
-        }
-        /* Styles for the item shop modal */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.7);
-        }
-        .modal-content {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: white;
-            padding: 20px;
-            border-radius: 5px;
-            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
-        }
-        .close {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            cursor: pointer;
-        }
     </style>
 </head>
 <body>
@@ -136,17 +98,6 @@
     <input type="number" id="speedInput" placeholder="Speed" min="1" value="5">
     <div id="pointsLabel">Points: 0</div>
     <button id="resetButton">Reset Points</button> <!-- Added reset button -->
-    <button id="shopButton">Open Shop</button> <!-- Added shop button -->
-
-    <!-- Item shop modal -->
-    <div class="modal" id="shopModal">
-        <div class="modal-content">
-            <span class="close" id="closeModal">&times;</span>
-            <h2>Item Shop</h2>
-            <p>Items and prices go here:</p>
-            <button id="buyBoost">Win the game! (999999999 pts)</button>
-        </div>
-    </div>
     
     <script>
         const cube = document.getElementById('cube');
@@ -154,10 +105,6 @@
         const speedInput = document.getElementById('speedInput');
         const pointsLabel = document.getElementById('pointsLabel');
         const resetButton = document.getElementById('resetButton'); // Added reset button element
-        const shopButton = document.getElementById('shopButton'); // Added shop button element
-        const shopModal = document.getElementById('shopModal'); // Added shop modal element
-        const closeModal = document.getElementById('closeModal'); // Added close button element
-        const buyBoostButton = document.getElementById('buyBoost'); // Added buy boost button
         const redBlocks = [];
         const orangeBlocks = [];
         const yellowBlocks = [];
@@ -165,8 +112,6 @@
         const lightBlueBlocks = [];
         const cyanBlocks = []; /* Added an array for cyan blocks */
         let points = 0;
-        let boostActive = false; // Flag to track if the boost is active
-        let boostTimeout;
 
         let cubeX = window.innerWidth / 2 - cube.offsetWidth / 2;
         let cubeY = window.innerHeight / 2 - cube.offsetHeight / 2;
@@ -334,7 +279,7 @@
                 const rect2 = lightBlueBlock.getBoundingClientRect();
 
                 if (
-                    rect1left < rect2.right &&
+                    rect1.left < rect2.right &&
                     rect1.right > rect2.left &&
                     rect1.top < rect2.bottom &&
                     rect1.bottom > rect2.top
@@ -377,41 +322,39 @@
 
         // Event listener for keyboard input
         document.addEventListener('keydown', function(event) {
-            if (!boostActive) { // Only allow movement if the boost is not active
-                switch (event.key) {
-                    case 'ArrowLeft':
-                    case 'a':
-                        cubeX -= speed;
-                        break;
-                    case 'ArrowRight':
-                    case 'd':
-                        cubeX += speed;
-                        break;
-                    case 'ArrowUp':
-                    case 'w':
-                        cubeY -= speed;
-                        break;
-                    case 'ArrowDown':
-                    case 's':
-                        cubeY += speed;
-                        break;
-                }
-
-                // Ensure the cube stays within the container
-                cubeX = Math.max(0, Math.min(window.innerWidth - cube.offsetWidth, cubeX));
-                cubeY = Math.max(0, Math.min(window.innerHeight - cube.offsetHeight, cubeY));
-
-                updateCubePosition();
-                checkCollisions();
-                checkOrangeCollisions();
-                checkYellowCollisions();
-                checkLightGreenCollisions();
-                checkLightBlueCollisions();
-                checkCyanCollisions(); /* Added check for cyan collisions */
-
-                // Save the points in local storage
-                localStorage.setItem('points', points.toString());
+            switch (event.key) {
+                case 'ArrowLeft':
+                case 'a':
+                    cubeX -= speed;
+                    break;
+                case 'ArrowRight':
+                case 'd':
+                    cubeX += speed;
+                    break;
+                case 'ArrowUp':
+                case 'w':
+                    cubeY -= speed;
+                    break;
+                case 'ArrowDown':
+                case 's':
+                    cubeY += speed;
+                    break;
             }
+
+            // Ensure the cube stays within the container
+            cubeX = Math.max(0, Math.min(window.innerWidth - cube.offsetWidth, cubeX));
+            cubeY = Math.max(0, Math.min(window.innerHeight - cube.offsetHeight, cubeY));
+
+            updateCubePosition();
+            checkCollisions();
+            checkOrangeCollisions();
+            checkYellowCollisions();
+            checkLightGreenCollisions();
+            checkLightBlueCollisions();
+            checkCyanCollisions(); /* Added check for cyan collisions */
+
+            // Save the points in local storage
+            localStorage.setItem('points', points.toString());
         });
 
         // Event listener for speed input change
@@ -435,44 +378,6 @@
                 localStorage.setItem('points', '0'); // Reset points in local storage
             }
         });
-
-        // Event listener for shop button click to open the shop modal
-        shopButton.addEventListener('click', function() {
-            shopModal.style.display = 'block';
-        });
-
-        // Event listener to close the shop modal when clicking the close button (X)
-        closeModal.addEventListener('click', function() {
-            shopModal.style.display = 'none';
-        });
-
-        // Event listener for buy boost button click
-        buyBoostButton.addEventListener('click', function() {
-            if (points >= 999999999) {
-                points -= 999999999;
-                updatePointsLabel();
-                activateBoost();
-            } else {
-                alert('Not enough points to buy the boost.');
-            }
-        });
-
-        // Function to activate the boost
-        function activateBoost() {
-            if (!boostActive) {
-                boostActive = true;
-            points += 10000000000000000000000000000000000000000000000000000000
-                updatePointsLabel();
-                clearTimeout(boostTimeout);
-                boostTimeout = setTimeout(deactivateBoost, 5000); // Deactivate boost after 5 seconds
-            }
-        }
-
-        // Function to deactivate the boost
-        function deactivateBoost() {
-            boostActive = false;
-            // Add logic to revert any changes made by the boost (if needed)
-        }
 
         // Create red blocks at random intervals
         setInterval(createRedBlock, 2000);
